@@ -1,3 +1,87 @@
+/* Animation Classes */
+.fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.fade-in.visible {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+}
+
+.slide-in-left {
+    opacity: 0;
+    transform: translateX(-50px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.slide-in-left.visible {
+    opacity: 1 !important;
+    transform: translateX(0) !important;
+}
+
+.slide-in-right {
+    opacity: 0;
+    transform: translateX(50px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.slide-in-right.visible {
+    opacity: 1 !important;
+    transform: translateX(0) !important;
+}
+
+.scale-in {
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.scale-in.visible {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+}
+
+.hero-animate {
+    opacity: 0;
+    transform: translateY(50px);
+    animation: heroFadeIn 1.2s ease forwards;
+}
+
+@keyframes heroFadeIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.image-hover {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.image-hover:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Fallback: Show content after 2 seconds if JavaScript doesn't load */
+.fade-in, .slide-in-left, .slide-in-right, .scale-in {
+    animation: fallbackShow 0.1s ease 2s forwards;
+}
+
+/* Faster fallback for event cards */
+.event-card.scale-in {
+    animation: fallbackShow 0.1s ease 1s forwards;
+}
+
+@keyframes fallbackShow {
+    to {
+        opacity: 1;
+        transform: translateY(0) translateX(0) scale(1);
+    }
+}
+
 .story { padding: var(--spacing-4xl) 0; background-color: var(--white); }
 .story-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: var(--spacing-3xl); align-items: start; }
 .story .section-header p {

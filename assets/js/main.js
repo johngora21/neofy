@@ -51,46 +51,60 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Intersection Observer for animations
+    // Intersection Observer for scroll-triggered animations
     const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
+        threshold: 0.05,
+        rootMargin: '0px 0px -20px 0px'
     };
     
-    const observer = new IntersectionObserver(function(entries) {
+    const animationObserver = new IntersectionObserver(function(entries) {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
+                entry.target.classList.add('visible');
+                console.log('Animation triggered for:', entry.target.className);
             }
         });
     }, observerOptions);
     
-    // Observe elements for animation
-    const animateElements = document.querySelectorAll(
-        '.feature-item, .impact-item, .solution-item, .partner-category'
+    // Observe all animated elements
+    const animatedElements = document.querySelectorAll(
+        '.fade-in, .slide-in-left, .slide-in-right, .scale-in'
     );
-    animateElements.forEach(el => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(30px)';
-        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-        observer.observe(el);
+    
+    console.log('Found animated elements:', animatedElements.length);
+    
+    animatedElements.forEach(el => {
+        animationObserver.observe(el);
     });
-
-    // Animate key images on reveal
-    const imageSelectors = [
-        '.story-image img',
-        '.about-image img',
-        '.solutions-image img',
-        '.event-media img'
-    ];
-    const imageElements = document.querySelectorAll(imageSelectors.join(', '));
-    imageElements.forEach(img => {
-        img.style.opacity = '0';
-        img.style.transform = 'scale(1.03)';
-        img.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-        observer.observe(img);
+    
+    // Special observer for event cards with more sensitive settings
+    const eventCardObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                console.log('Event card animation triggered for:', entry.target.className);
+            }
+        });
+    }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px 0px 0px'
     });
+    
+    // Observe event cards specifically
+    const eventCards = document.querySelectorAll('.event-card.scale-in');
+    eventCards.forEach(card => {
+        eventCardObserver.observe(card);
+    });
+    
+    // Fallback: If no elements are found, show all content after 1 second
+    if (animatedElements.length === 0) {
+        console.log('No animated elements found, showing all content');
+        setTimeout(() => {
+            document.querySelectorAll('.fade-in, .slide-in-left, .slide-in-right, .scale-in').forEach(el => {
+                el.classList.add('visible');
+            });
+        }, 1000);
+    }
 
     // Staggered word/line reveal for Solutions (vertical list)
     function initStaggeredReveal() {
@@ -400,6 +414,16 @@ document.addEventListener('DOMContentLoaded', function() {
     if (navMenu) {
         trapFocus(navMenu);
     }
+    
+    // Emergency fallback: Show all content after 3 seconds regardless
+    setTimeout(() => {
+        document.querySelectorAll('.fade-in, .slide-in-left, .slide-in-right, .scale-in').forEach(el => {
+            if (!el.classList.contains('visible')) {
+                el.classList.add('visible');
+                console.log('Emergency fallback: showing element', el.className);
+            }
+        });
+    }, 3000);
     
     console.log('Neofy website initialized successfully!');
 });
