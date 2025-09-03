@@ -60,13 +60,41 @@ document.addEventListener('DOMContentLoaded', function() {
     const animationObserver = new IntersectionObserver(function(entries) {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-                console.log('Animation triggered for:', entry.target.className);
+                const element = entry.target;
+                const delay = element.style.animationDelay || '0s';
+                
+                // Convert delay to milliseconds
+                const delayMs = parseFloat(delay) * 1000;
+                
+                setTimeout(() => {
+                    element.classList.add('visible');
+                    console.log('Animation triggered for:', element.className, 'with delay:', delay);
+                    
+                    // Special handling for about images - hide first image when second appears
+                    if (element.classList.contains('about-image') && delayMs > 0) {
+                        console.log('Second about image triggered, hiding first image');
+                        const aboutImages = document.querySelectorAll('.about-image');
+                        if (aboutImages.length >= 2) {
+                            // Hide the first image with fade out
+                            aboutImages[0].style.opacity = '0';
+                            aboutImages[0].style.transition = 'opacity 0.5s ease';
+                            
+                            // Show the second image with slide in
+                            element.style.opacity = '1';
+                            element.style.transform = 'translateX(0)';
+                            element.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+                            element.style.zIndex = '2';
+                            
+                            console.log('First image opacity:', aboutImages[0].style.opacity);
+                            console.log('Second image opacity:', element.style.opacity);
+                        }
+                    }
+                }, delayMs);
             }
         });
     }, observerOptions);
     
-    // Observe all animated elements
+    // Observe all animated elements (excluding about images which have their own observer)
     const animatedElements = document.querySelectorAll(
         '.fade-in, .slide-in-left, .slide-in-right, .scale-in'
     );
@@ -74,7 +102,12 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Found animated elements:', animatedElements.length);
     
     animatedElements.forEach(el => {
-        animationObserver.observe(el);
+        // Skip about images as they have their own special observer
+        if (!el.classList.contains('about-image')) {
+            animationObserver.observe(el);
+        } else {
+            console.log('Skipping about-image from main observer:', el);
+        }
     });
     
     // Special observer for event cards with more sensitive settings
@@ -95,6 +128,8 @@ document.addEventListener('DOMContentLoaded', function() {
     eventCards.forEach(card => {
         eventCardObserver.observe(card);
     });
+    
+
     
     // Fallback: If no elements are found, show all content after 1 second
     if (animatedElements.length === 0) {
@@ -389,7 +424,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Trap focus in mobile menu when open
     function trapFocus(element) {
-        const focusableContent = element.querySelectorAll(focusableElements);
+        const focusableContent = element.querySelectorAll('a[href], button, textarea, input[type="text"], input[type="email"], select');
         const firstFocusableElement = focusableContent[0];
         const lastFocusableElement = focusableContent[focusableContent.length - 1];
         
